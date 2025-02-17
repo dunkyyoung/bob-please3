@@ -1,19 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./App.css";
+
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch("https://dummyjson.com/products")
       .then((res) => res.json())
-      .then((data) => setProducts(data.products))
-      .catch((error) => console.error("Error fetching products:", error));
+      .then((data) => {
+        setProducts(data.products);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching products");
+        setLoading(false);
+      });
   }, []);
 
-  const handleRemove = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
-  };
+  
+  const handleRemove = useCallback((id) => {
+    setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="product-grid">
@@ -23,6 +36,7 @@ const ProductList = () => {
     </div>
   );
 };
+
 
 const ProductItem = ({ product, onRemove }) => {
   return (
@@ -35,21 +49,32 @@ const ProductItem = ({ product, onRemove }) => {
   );
 };
 
+
 const Stars = ({ rating }) => {
-  const fullStars = Math.round(rating);
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5;
+  
   return (
-    <div>
-      {[...Array(5)].map((_, index) => (
-        <span key={index} className={`fa fa-star ${index < fullStars ? "active" : ""}`}></span>
-      ))}
+    <div className="stars">
+      {[...Array(5)].map((_, index) => {
+        if (index < fullStars) {
+          return <span key={index} className="fa fa-star active"></span>;
+        }
+        if (halfStar && index === fullStars) {
+          return <span key={index} className="fa fa-star-half-o active"></span>;
+        }
+        return <span key={index} className="fa fa-star"></span>;
+      })}
     </div>
   );
 };
+
 
 const Header = () => {
   const scrollToFooter = () => {
     document.getElementById("footer").scrollIntoView({ behavior: "smooth" });
   };
+
   return (
     <header>
       <h1>ITEM SHOP BY DUNKYOUNG</h1>
@@ -58,7 +83,13 @@ const Header = () => {
   );
 };
 
-const Footer = () => <footer id="footer">&copy; 2025 ITEM SHOP BY DUNKYOUNG</footer>;
+
+const Footer = () => (
+  <footer id="footer">
+    <p>&copy; 2025 ITEM SHOP BY DUNKYOUNG</p>
+  </footer>
+);
+
 
 const App = () => {
   return (

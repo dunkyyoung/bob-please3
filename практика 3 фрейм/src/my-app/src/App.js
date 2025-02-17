@@ -52,13 +52,13 @@ const Header = () => {
   };
   return (
     <header>
-      <h1>Product Store by Sitnikov Anton</h1>
+      <h1>ITEM SHOP BY DUNKYOUNG</h1>
       <button onClick={scrollToFooter}>Scroll to Footer</button>
     </header>
   );
 };
 
-const Footer = () => <footer id="footer">&copy; 2025 Product Store by Sitnikov Anton</footer>;
+const Footer = () => <footer id="footer">&copy; 2025 ITEM SHOP BY DUNKYOUNG</footer>;
 
 const App = () => {
   return (
